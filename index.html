@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoBot Pro - Advanced Trading Bot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(45deg, #764ba2, #667eea);
+        }
+
+        .content-section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #e74c3c);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+        }
+
+        .status-card {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .status-indicator {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .strategy-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .strategy-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .wallet-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #fff;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .wallet-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+
+        .positions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .positions-table th, .positions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .positions-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .profit-positive {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .profit-negative {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .indicator-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .indicator-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .indicator-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .nav-tab {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Screen -->
+        <div id="loginScreen">
+            <div class="login-container">
+                <h2 class="logo">CryptoBot Pro</h2>
+                <div id="walletConnectSection">
+                    <button class="wallet-btn" onclick="connectMetaMask()">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
+                        Connect with MetaMask
+                    </button>
+                    <button class="wallet-btn" onclick="connectBitGetWallet()">
+                        <img src="https://bitget-wallet-prod.oss-ap-southeast-1.aliyuncs.com/logo/icon_256x256.png" alt="BitGet Wallet">
+                        Connect with BitGet Wallet
+                    </button>
+                </div>
+                <div id="walletConnectedSection" style="display: none;">
+                    <h3 style="text-align: center; margin-bottom: 15px;">Wallet Connected</h3>
+                    <div class="wallet-address" id="walletAddress"></div>
+                    <div style="text-align: center; margin: 15px 0;">
+                        <button class="btn" onclick="disconnectWallet()" style="width: 100%;">Disconnect</button>
+                    </div>
+                    <div style="text-align: center;">
+                        <button class="btn" onclick="proceedToApp()" style="width: 100%;">Proceed to App</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application -->
+        <div id="mainApp" style="display: none;">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">CryptoBot Pro</div>
+                    <div class="nav-tabs">
+                        <button class="nav-tab active" onclick="showTab('dashboard')">Dashboard</button>
+                        <button class="nav-tab" onclick="showTab('config')">Configuration</button>
+                        <button class="nav-tab" onclick="showTab('strategies')">Strategies</button>
+                        <button class="nav-tab" onclick="showTab('positions')">Positions</button>
+                        <button class="nav-tab" onclick="showTab('backtest')">Backtest</button>
+                        <button class="nav-tab" onclick="showTab('analytics')">Analytics</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="content-section active">
+                    <div class="status-card">
+                        <div class="status-indicator" id="botStatus">🤖</div>
+                        <h2>Bot Status: <span id="statusText">Stopped</span></h2>
+                        <p>Total Profit: <span id="totalProfit">$0.00</span></p>
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success" onclick="startBot()">Start Bot</button>
+                            <button class="btn btn-danger" onclick="stopBot()">Stop Bot</button>
+                            <button class="btn btn-warning" onclick="pauseBot()">Pause Bot</button>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Account Balance</h3>
+                            <div class="indicator-grid">
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="totalBalance">$0.00</div>
+                                    <div class="indicator-label">Total Balance</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="availableBalance">$0.00</div>
+                                    <div class="indicator-label">Available</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="usedMargin">$0.00</div>
+                                    <div class="indicator-label">Used Margin</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Trading Statistics</h3>
+                            <div class="indicator-grid">
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="totalTrades">0</div>
+                                    <div class="indicator-label">Total Trades</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="winRate">0%</div>
+                                    <div class="indicator-label">Win Rate</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="profitFactor">0.00</div>
+                                    <div class="indicator-label">Profit Factor</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Profit/Loss Chart</h3>
+                        <div class="chart-container">
+                            <canvas id="profitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuration Tab -->
+                <div id="config" class="content-section">
+                    <div class="grid">
+                        <div class="card">
+                            <h3>API Configuration</h3>
+                            <div class="form-group">
+                                <label>Binance API Key</label>
+                                <input type="password" id="apiKey" placeholder="Enter your Binance API Key">
+                            </div>
+                            <div class="form-group">
+                                <label>Binance Secret Key</label>
+                                <input type="password" id="secretKey" placeholder="Enter your Binance Secret Key">
+                            </div>
+                            <div class="form-group">
+                                <label>Telegram Bot Token</label>
+                                <input type="text" id="telegramToken" placeholder="Enter Telegram Bot Token">
+                            </div>
+                            <div class="form-group">
+                                <label>Telegram Chat ID</label>
+                                <input type="text" id="chatId" placeholder="Enter Chat ID">
+                            </div>
+                            <button class="btn" onclick="saveApiConfig()">Save API Configuration</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>Trading Pairs</h3>
+                            <div class="form-group">
+                                <label>Trading Pairs (comma separated)</label>
+                                <input type="text" id="tradingPairs" value="BTCUSDT,ETHUSDT,BNBUSDT" placeholder="BTCUSDT,ETHUSDT">
+                            </div>
+                            <div class="form-group">
+                                <label>Leverage</label>
+                                <select id="leverage">
+                                    <option value="1">1x</option>
+                                    <option value="2">2x</option>
+                                    <option value="5">5x</option>
+                                    <option value="10" selected>10x</option>
+                                    <option value="20">20x</option>
+                                    <option value="50">50x</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Risk Percentage per Trade</label>
+                                <input type="number" id="riskPercent" value="1.0" step="0.1" min="0.1" max="10">
+                            </div>
+                            <button class="btn" onclick="saveTradingConfig()">Save Trading Configuration</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>Risk Management</h3>
+                            <div class="form-group">
+                                <label>Stop Loss Multiplier</label>
+                                <input type="number" id="slMultiplier" value="2.0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Take Profit Multiplier</label>
+                                <input type="number" id="tpMultiplier" value="3.0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Risk/Reward Ratio</label>
+                                <input type="number" id="rrRatio" value="2.0" step="0.1">
+                            </div>
+                            <div class="form-group">
+                                <label>Max Drawdown %</label>
+                                <input type="number" id="maxDrawdown" value="15" min="1" max="50">
+                            </div>
+                            <button class="btn" onclick="saveRiskConfig()">Save Risk Configuration</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategies Tab -->
+                <div id="strategies" class="content-section">
+                    <div class="card">
+                        <h3>Trading Strategies</h3>
+                        <p>Select your preferred trading strategy:</p>
+                        <div class="strategy-grid">
+                            <div class="strategy-card" onclick="selectStrategy('TREND')">
+                                <h4>📈 Trend Following</h4>
+                                <p>Follows market trends using moving averages and momentum indicators</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('MEANREV')">
+                                <h4>🔄 Mean Reversion</h4>
+                                <p>Capitalizes on price reversals using RSI and Bollinger Bands</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('MOMENTUM')">
+                                <h4>🚀 Momentum</h4>
+                                <p>Trades based on strong price momentum and volume</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('VALUEPLAY')">
+                                <h4>💰 Value Play</h4>
+                                <p>Identifies undervalued assets using fundamental analysis</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('PIVOT')">
+                                <h4>📊 Pivot Points</h4>
+                                <p>Uses pivot points to identify support and resistance levels</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('REVERSAL')">
+                                <h4>🔄 Reversal</h4>
+                                <p>Detects trend reversals using candlestick patterns</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('GRID')">
+                                <h4>🎯 Grid Trading</h4>
+                                <p>Places buy and sell orders at predetermined intervals</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('ARBITRAGE')">
+                                <h4>⚖️ Arbitrage</h4>
+                                <p>Exploits price differences across different exchanges</p>
+                            </div>
+                            <div class="strategy-card" onclick="selectStrategy('EMACD')">
+                                <h4>📊 EMA + MACD</h4>
+                                <p>Combines EMA (9,21) with MACD (7,12,9) for signals</p>
+                            </div>
+                            <div class="strategy-card selected" onclick="selectStrategy('COMBO')">
+                                <h4>🎯 Super Combo</h4>
+                                <p>Automatically combines all strategies for optimal performance</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <button class="btn" onclick="saveStrategy()">Save Strategy Selection</button>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Strategy Parameters</h3>
+                            <div class="form-group">
+                                <label>EMA Short Period</label>
+                                <input type="number" id="emaShort" value="9" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>EMA Long Period</label>
+                                <input type="number" id="emaLong" value="21" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>RSI Period</label>
+                                <input type="number" id="rsiPeriod" value="14" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>MACD Fast Period</label>
+                                <input type="number" id="macdFast" value="12" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>MACD Slow Period</label>
+                                <input type="number" id="macdSlow" value="26" min="1">
+                            </div>
+                            <div class="form-group">
+                                <label>MACD Signal Period</label>
+                                <input type="number" id="macdSignal" value="9" min="1">
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Timeframes</h3>
+                            <div class="form-group">
+                                <label>Primary Timeframe</label>
+                                <select id="primaryTimeframe">
+                                    <option value="1m">1 Minute</option>
+                                    <option value="5m">5 Minutes</option>
+                                    <option value="15m">15 Minutes</option>
+                                    <option value="1h" selected>1 Hour</option>
+                                    <option value="4h">4 Hours</option>
+                                    <option value="1d">1 Day</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Secondary Timeframes (comma separated)</label>
+                                <input type="text" id="secondaryTimeframes" value="4h,1h,15m,5m">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Positions Tab -->
+                <div id="positions" class="content-section">
+                    <div class="card">
+                        <h3>Open Positions</h3>
+                        <table class="positions-table">
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Side</th>
+                                    <th>Size</th>
+                                    <th>Entry Price</th>
+                                    <th>Current Price</th>
+                                    <th>PnL</th>
+                                    <th>PnL %</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="positionsTableBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px;">No open positions</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3>Trade History</h3>
+                        <table class="positions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Symbol</th>
+                                    <th>Side</th>
+                                    <th>Size</th>
+                                    <th>Entry</th>
+                                    <th>Exit</th>
+                                    <th>PnL</th>
+                                    <th>Strategy</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tradeHistoryBody">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 40px;">No trade history</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Backtest Tab -->
+                <div id="backtest" class="content-section">
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Backtest Configuration</h3>
+                            <div class="form-group">
+                                <label>Start Date</label>
+                                <input type="date" id="backtestStartDate">
+                            </div>
+                            <div class="form-group">
+                                <label>End Date</label>
+                                <input type="date" id="backtestEndDate">
+                            </div>
+                            <div class="form-group">
+                                <label>Initial Capital</label>
+                                <input type="number" id="initialCapital" value="10000" min="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Commission Rate (%)</label>
+                                <input type="number" id="commissionRate" value="0.1" step="0.01" min="0">
+                            </div>
+                            <button class="btn" onclick="runBacktest()">Run Backtest</button>
+                        </div>
+
+                        <div class="card">
+                            <h3>Backtest Results</h3>
+                            <div class="indicator-grid">
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="backtestReturn">0%</div>
+                                    <div class="indicator-label">Total Return</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="backtestSharpe">0.00</div>
+                                    <div class="indicator-label">Sharpe Ratio</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="backtestMaxDD">0%</div>
+                                    <div class="indicator-label">Max Drawdown</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="backtestWinRate">0%</div>
+                                    <div class="indicator-label">Win Rate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Backtest Equity Curve</h3>
+                        <div class="chart-container">
+                            <canvas id="backtestChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div id="analytics" class="content-section">
+                    <div class="grid">
+                        <div class="card">
+                            <h3>Performance Metrics</h3>
+                            <div class="indicator-grid">
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="monthlyReturn">0%</div>
+                                    <div class="indicator-label">Monthly Return</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="volatility">0%</div>
+                                    <div class="indicator-label">Volatility</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="sortinoRatio">0.00</div>
+                                    <div class="indicator-label">Sortino Ratio</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="calmarRatio">0.00</div>
+                                    <div class="indicator-label">Calmar Ratio</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3>Risk Analysis</h3>
+                            <div class="indicator-grid">
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="varValue">0%</div>
+                                    <div class="indicator-label">VaR (95%)</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="cvarValue">0%</div>
+                                    <div class="indicator-label">CVaR (95%)</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="betaValue">0.00</div>
+                                    <div class="indicator-label">Beta</div>
+                                </div>
+                                <div class="indicator-card">
+                                    <div class="indicator-value" id="correlation">0.00</div>
+                                    <div class="indicator-label">Market Correlation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Performance Analytics</h3>
+                        <div class="chart-container">
+                            <canvas id="analyticsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let botRunning = false;
+        let selectedStrategy = 'COMBO';
+        let profitChart = null;
+        let backtestChart = null;
+        let analyticsChart = null;
+        let walletProvider = null;
+        let walletAddress = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            checkWalletConnection();
+        });
+
+        function initializeApp() {
+            // Set default dates
+            const today = new Date();
+            const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('backtestEndDate').value = today.toISOString().split('T')[0];
+            document.getElementById('backtestStartDate').value = monthAgo.toISOString().split('T')[0];
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Load saved configuration
+            loadConfiguration();
+        }
+
+        // Wallet connection functions
+        async function checkWalletConnection() {
+            // Check if MetaMask is installed
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        walletProvider = 'MetaMask';
+                        walletAddress = accounts[0];
+                        showWalletConnected();
+                    }
+                } catch (error) {
+                    console.error('Error checking MetaMask connection:', error);
+                }
+            }
+            
+            // Check if BitGet Wallet is installed
+            if (window.bitkeep && window.bitkeep.ethereum) {
+                try {
+                    const accounts = await window.bitkeep.ethereum.request({ method: 'eth_accounts' });
+                    if (accounts.length > 0) {
+                        walletProvider = 'BitGet';
+                        walletAddress = accounts[0];
+                        showWalletConnected();
+                    }
+                } catch (error) {
+                    console.error('Error checking BitGet Wallet connection:', error);
+                }
+            }
+        }
+
+        async function connectMetaMask() {
+            if (typeof window.ethereum === 'undefined') {
+                showNotification('MetaMask is not installed!', 'error');
+                return;
+            }
+
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length > 0) {
+                    walletProvider = 'MetaMask';
+                    walletAddress = accounts[0];
+                    showWalletConnected();
+                    showNotification('MetaMask connected successfully!', 'success');
+                }
+            } catch (error) {
+                console.error('Error connecting to MetaMask:', error);
+                showNotification('Failed to connect MetaMask: ' + error.message, 'error');
+            }
+        }
+
+        async function connectBitGetWallet() {
+            if (typeof window.bitkeep === 'undefined' || typeof window.bitkeep.ethereum === 'undefined') {
+                showNotification('BitGet Wallet is not installed!', 'error');
+                return;
+            }
+
+            try {
+                const accounts = await window.bitkeep.ethereum.request({ method: 'eth_requestAccounts' });
+                if (accounts.length > 0) {
+                    walletProvider = 'BitGet';
+                    walletAddress = accounts[0];
+                    showWalletConnected();
+                    showNotification('BitGet Wallet connected successfully!', 'success');
+                }
+            } catch (error) {
+                console.error('Error connecting to BitGet Wallet:', error);
+                showNotification('Failed to connect BitGet Wallet: ' + error.message, 'error');
+            }
+        }
+
+        function showWalletConnected() {
+            document.getElementById('walletConnectSection').style.display = 'none';
+            document.getElementById('walletConnectedSection').style.display = 'block';
+            document.getElementById('walletAddress').textContent = walletAddress;
+        }
+
+        function disconnectWallet() {
+            walletProvider = null;
+            walletAddress = null;
+            document.getElementById('walletConnectSection').style.display = 'block';
+            document.getElementById('walletConnectedSection').style.display = 'none';
+            showNotification('Wallet disconnected', 'info');
+        }
+
+        function proceedToApp() {
+            if (walletAddress) {
+                currentUser = { walletAddress: walletAddress, walletProvider: walletProvider };
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                updateDashboard();
+            }
+        }
+
+        // Tab navigation
+        function showTab(tabName) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Update chart if analytics tab is selected
+            if (tabName === 'analytics') {
+                updateAnalyticsChart();
+            }
+        }
+
+        // Bot control functions
+        function startBot() {
+            botRunning = true;
+            document.getElementById('statusText').textContent = 'Running';
+            document.getElementById('botStatus').textContent = '🟢';
+            showNotification('Trading bot started successfully!', 'success');
+            
+            // Simulate trading activity
+            simulateTradingActivity();
+        }
+
+        function stopBot() {
+            botRunning = false;
+            document.getElementById('statusText').textContent = 'Stopped';
+            document.getElementById('botStatus').textContent = '🔴';
+            showNotification('Trading bot stopped', 'info');
+        }
+
+        function pauseBot() {
+            botRunning = false;
+            document.getElementById('statusText').textContent = 'Paused';
+            document.getElementById('botStatus').textContent = '⏸️';
+            showNotification('Trading bot paused', 'warning');
+        }
+
+        // Configuration functions
+        function saveApiConfig() {
+            const apiKey = document.getElementById('apiKey').value;
+            const secretKey = document.getElementById('secretKey').value;
+            const telegramToken = document.getElementById('telegramToken').value;
+            const chatId = document.getElementById('chatId').value;
+            
+            // Save to localStorage (in production, encrypt and store securely)
+            const config = {
+                apiKey: apiKey,
+                secretKey: secretKey,
+                telegramToken: telegramToken,
+                chatId: chatId
+            };
+            
+            // In production, don't store sensitive data in localStorage
+            showNotification('API configuration saved successfully!', 'success');
+        }
+
+        function saveTradingConfig() {
+            const tradingPairs = document.getElementById('tradingPairs').value;
+            const leverage = document.getElementById('leverage').value;
+            const riskPercent = document.getElementById('riskPercent').value;
+            
+            showNotification('Trading configuration saved successfully!', 'success');
+        }
+
+        function saveRiskConfig() {
+            const slMultiplier = document.getElementById('slMultiplier').value;
+            const tpMultiplier = document.getElementById('tpMultiplier').value;
+            const rrRatio = document.getElementById('rrRatio').value;
+            const maxDrawdown = document.getElementById('maxDrawdown').value;
+            
+            showNotification('Risk management configuration saved successfully!', 'success');
+        }
+
+        // Strategy functions
+        function selectStrategy(strategy) {
+            selectedStrategy = strategy;
+            
+            // Remove selected class from all strategy cards
+            const cards = document.querySelectorAll('.strategy-card');
+            cards.forEach(card => card.classList.remove('selected'));
+            
+            // Add selected class to clicked card
+            event.target.classList.add('selected');
+        }
+
+        function saveStrategy() {
+            showNotification(`Strategy "${selectedStrategy}" saved successfully!`, 'success');
+        }
+
+        // Chart initialization
+        function initializeCharts() {
+            // Profit Chart
+            const profitCtx = document.getElementById('profitChart').getContext('2d');
+            profitChart = new Chart(profitCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Cumulative Profit',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+
+            // Backtest Chart
+            const backtestCtx = document.getElementById('backtestChart').getContext('2d');
+            backtestChart = new Chart(backtestCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: [],
+                        borderColor: '#28a745',
+                        backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toFixed(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Analytics Chart
+            const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
+            analyticsChart = new Chart(analyticsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Monthly Returns (%)',
+                        data: [2.3, -1.2, 4.5, 3.1, -0.8, 5.2],
+                        backgroundColor: [
+                            '#28a745', '#dc3545', '#28a745', '#28a745', '#dc3545', '#28a745'
+                        ],
+                        borderColor: [
+                            '#1e7e34', '#c82333', '#1e7e34', '#1e7e34', '#c82333', '#1e7e34'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Backtest functions
+        function runBacktest() {
+            const startDate = document.getElementById('backtestStartDate').value;
+            const endDate = document.getElementById('backtestEndDate').value;
+            const initialCapital = parseFloat(document.getElementById('initialCapital').value);
+            const commissionRate = parseFloat(document.getElementById('commissionRate').value);
+            
+            if (!startDate || !endDate || !initialCapital) {
+                showNotification('Please fill in all backtest parameters', 'error');
+                return;
+            }
+            
+            showNotification('Running backtest...', 'info');
+            
+            // Simulate backtest results
+            setTimeout(() => {
+                const results = simulateBacktestResults(initialCapital);
+                updateBacktestResults(results);
+                updateBacktestChart(results);
+                showNotification('Backtest completed successfully!', 'success');
+            }, 2000);
+        }
+
+        function simulateBacktestResults(initialCapital) {
+            // Simulate realistic backtest results
+            const totalReturn = (Math.random() * 40 - 10); // -10% to +30%
+            const sharpeRatio = Math.random() * 2 + 0.5; // 0.5 to 2.5
+            const maxDrawdown = Math.random() * 15 + 2; // 2% to 17%
+            const winRate = Math.random() * 30 + 55; // 55% to 85%
+            
+            // Generate equity curve data
+            const days = 30;
+            const equityCurve = [];
+            let currentValue = initialCapital;
+            
+            for (let i = 0; i <= days; i++) {
+                const dailyReturn = (Math.random() - 0.5) * 0.04; // -2% to +2% daily
+                currentValue *= (1 + dailyReturn);
+                equityCurve.push({
+                    date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000),
+                    value: currentValue
+                });
+            }
+            
+            return {
+                totalReturn,
+                sharpeRatio,
+                maxDrawdown,
+                winRate,
+                equityCurve
+            };
+        }
+
+        function updateBacktestResults(results) {
+            document.getElementById('backtestReturn').textContent = results.totalReturn.toFixed(2) + '%';
+            document.getElementById('backtestSharpe').textContent = results.sharpeRatio.toFixed(2);
+            document.getElementById('backtestMaxDD').textContent = results.maxDrawdown.toFixed(2) + '%';
+            document.getElementById('backtestWinRate').textContent = results.winRate.toFixed(1) + '%';
+        }
+
+        function updateBacktestChart(results) {
+            const labels = results.equityCurve.map(point => 
+                point.date.toLocaleDateString()
+            );
+            const data = results.equityCurve.map(point => point.value);
+            
+            backtestChart.data.labels = labels;
+            backtestChart.data.datasets[0].data = data;
+            backtestChart.update();
+        }
+
+        // Dashboard updates
+        function updateDashboard() {
+            // Simulate account data
+            const totalBalance = 10000 + Math.random() * 5000;
+            const availableBalance = totalBalance * 0.7;
+            const usedMargin = totalBalance - availableBalance;
+            const totalProfit = Math.random() * 1000 - 200;
+            
+            document.getElementById('totalBalance').textContent = '$' + totalBalance.toFixed(2);
+            document.getElementById('availableBalance').textContent = '$' + availableBalance.toFixed(2);
+            document.getElementById('usedMargin').textContent = '$' + usedMargin.toFixed(2);
+            document.getElementById('totalProfit').textContent = '$' + totalProfit.toFixed(2);
+            
+            // Update trading statistics
+            document.getElementById('totalTrades').textContent = Math.floor(Math.random() * 100 + 50);
+            document.getElementById('winRate').textContent = (Math.random() * 30 + 60).toFixed(1) + '%';
+            document.getElementById('profitFactor').textContent = (Math.random() * 1.5 + 1).toFixed(2);
+            
+            // Update analytics
+            document.getElementById('monthlyReturn').textContent = (Math.random() * 10 + 2).toFixed(1) + '%';
+            document.getElementById('volatility').textContent = (Math.random() * 5 + 5).toFixed(1) + '%';
+            document.getElementById('sortinoRatio').textContent = (Math.random() * 1.5 + 0.5).toFixed(2);
+            document.getElementById('calmarRatio').textContent = (Math.random() * 1 + 0.5).toFixed(2);
+            
+            // Update risk metrics
+            document.getElementById('varValue').textContent = (Math.random() * 3 + 1).toFixed(1) + '%';
+            document.getElementById('cvarValue').textContent = (Math.random() * 5 + 2).toFixed(1) + '%';
+            document.getElementById('betaValue').textContent = (Math.random() * 0.5 + 0.8).toFixed(2);
+            document.getElementById('correlation').textContent = (Math.random() * 0.4 + 0.6).toFixed(2);
+        }
+
+        function simulateTradingActivity() {
+            if (!botRunning) return;
+            
+            // Update profit chart periodically
+            setTimeout(() => {
+                const now = new Date();
+                const profit = Math.random() * 100 - 50;
+                
+                profitChart.data.labels.push(now.toLocaleTimeString());
+                profitChart.data.datasets[0].data.push(profit);
+                
+                // Keep only last 20 data points
+                if (profitChart.data.labels.length > 20) {
+                    profitChart.data.labels.shift();
+                    profitChart.data.datasets[0].data.shift();
+                }
+                
+                profitChart.update();
+                
+                // Continue simulation if bot is still running
+                if (botRunning) {
+                    simulateTradingActivity();
+                }
+            }, 5000);
+        }
+
+        function updateAnalyticsChart() {
+            // Update analytics chart with new data
+            const newData = [];
+            for (let i = 0; i < 6; i++) {
+                newData.push(Math.random() * 10 - 2); // -2% to +8%
+            }
+            
+            analyticsChart.data.datasets[0].data = newData;
+            analyticsChart.data.datasets[0].backgroundColor = newData.map(value => 
+                value >= 0 ? '#28a745' : '#dc3545'
+            );
+            analyticsChart.data.datasets[0].borderColor = newData.map(value => 
+                value >= 0 ? '#1e7e34' : '#c82333'
+            );
+            analyticsChart.update();
+        }
+
+        // Utility functions
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show';
+            
+            if (type === 'error') {
+                notification.style.background = '#dc3545';
+            } else if (type === 'warning') {
+                notification.style.background = '#ffc107';
+                notification.style.color = '#000';
+            } else if (type === 'info') {
+                notification.style.background = '#17a2b8';
+            } else {
+                notification.style.background = '#28a745';
+            }
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function loadConfiguration() {
+            // Load saved configuration from localStorage
+            // In production, load from secure backend
+        }
+
+        // Simulate real-time position updates
+        function updatePositions() {
+            const positions = [
+                {
+                    symbol: 'BTCUSDT',
+                    side: 'LONG',
+                    size: '0.1',
+                    entryPrice: '45000',
+                    currentPrice: '45500',
+                    pnl: 50,
+                    pnlPercent: 1.11
+                },
+                {
+                    symbol: 'ETHUSDT',
+                    side: 'SHORT',
+                    size: '2.0',
+                    entryPrice: '3000',
+                    currentPrice: '2950',
+                    pnl: 100,
+                    pnlPercent: 1.67
+                }
+            ];
+            
+            const tbody = document.getElementById('positionsTableBody');
+            tbody.innerHTML = '';
+            
+            positions.forEach(pos => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pos.symbol}</td>
+                    <td><span style="color: ${pos.side === 'LONG' ? '#28a745' : '#dc3545'}">${pos.side}</span></td>
+                    <td>${pos.size}</td>
+                    <td>${pos.entryPrice}</td>
+                    <td>${pos.currentPrice}</td>
+                    <td class="${pos.pnl >= 0 ? 'profit-positive' : 'profit-negative'}">${pos.pnl.toFixed(2)}</td>
+                    <td class="${pos.pnl >= 0 ? 'profit-positive' : 'profit-negative'}">${pos.pnlPercent.toFixed(2)}%</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="closePosition('${pos.symbol}')">Close</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function closePosition(symbol) {
+            showNotification(`Position ${symbol} closed successfully!`, 'success');
+            updatePositions();
+        }
+
+        // Initialize positions when page loads
+        setTimeout(updatePositions, 1000);
+        
+        // Auto-update positions every 10 seconds
+        setInterval(updatePositions, 10000);
+    </script>
+</body>
+</html>
