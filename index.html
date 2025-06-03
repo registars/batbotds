@@ -779,33 +779,21 @@
     <div id="notification" class="notification"></div>
 
     <script>
-    // Global variables
-    let currentUser = null;
-    let botRunning = false;
-    let selectedStrategy = 'COMBO';
-    let profitChart = null;
-    let backtestChart = null;
-    let analyticsChart = null;
-    let walletProvider = null;
-    let walletAddress = null;
-    let botConfig = {
-        apiKey: '',
-        secretKey: '',
-        tradingPairs: ['BTCUSDT', 'ETHUSDT'],
-        leverage: 10,
-        riskPercent: 1,
-        strategyParams: {
-            emaShort: 9,
-            emaLong: 21,
-            rsiPeriod: 14
-        }
-    };
+        // Global variables
+        let currentUser = null;
+        let botRunning = false;
+        let selectedStrategy = 'COMBO';
+        let profitChart = null;
+        let backtestChart = null;
+        let analyticsChart = null;
+        let walletProvider = null;
+        let walletAddress = null;
 
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeApp();
-        checkWalletConnection();
-    });
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            checkWalletConnection();
+        });
 
         function initializeApp() {
             // Set default dates
@@ -938,178 +926,30 @@
             }
         }
 
-        // Enhanced bot control functions
-    async function startBot() {
-        try {
-            // Get current configuration
-            const tradingPairs = document.getElementById('tradingPairs').value.split(',').map(p => p.trim());
-            const leverage = parseInt(document.getElementById('leverage').value);
-            const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+        // Bot control functions
+        function startBot() {
+            botRunning = true;
+            document.getElementById('statusText').textContent = 'Running';
+            document.getElementById('botStatus').textContent = '🟢';
+            showNotification('Trading bot started successfully!', 'success');
             
-            // Call API to start bot
-            const response = await fetch('/api/bot/start', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    strategy: selectedStrategy,
-                    symbols: tradingPairs,
-                    leverage,
-                    riskPercent
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                botRunning = true;
-                document.getElementById('statusText').textContent = 'Running';
-                document.getElementById('botStatus').textContent = '🟢';
-                showNotification('Trading bot started successfully!', 'success');
-                
-                // Start updating dashboard
-                updateDashboard();
-            } else {
-                showNotification('Failed to start bot: ' + result.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error starting bot:', error);
-            showNotification('Error starting bot: ' + error.message, 'error');
+            // Simulate trading activity
+            simulateTradingActivity();
         }
-    }
 
-    async function stopBot() {
-        try {
-            const response = await fetch('/api/bot/stop', {
-                method: 'POST'
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                botRunning = false;
-                document.getElementById('statusText').textContent = 'Stopped';
-                document.getElementById('botStatus').textContent = '🔴';
-                showNotification('Trading bot stopped', 'info');
-            } else {
-                showNotification('Failed to stop bot: ' + result.message, 'error');
-            }
-        } catch (error) {
-            console.error('Error stopping bot:', error);
-            showNotification('Error stopping bot: ' + error.message, 'error');
+        function stopBot() {
+            botRunning = false;
+            document.getElementById('statusText').textContent = 'Stopped';
+            document.getElementById('botStatus').textContent = '🔴';
+            showNotification('Trading bot stopped', 'info');
         }
-    }
 
-    async function updateDashboard() {
-        try {
-            // Get account positions
-            const positionsResponse = await fetch('/api/positions');
-            const positionsData = await positionsResponse.json();
-            
-            if (positionsData.success) {
-                updatePositionsTable(positionsData.positions);
-            }
-            
-            // Simulate account data (in real app, get from API)
-            const totalBalance = 10000 + Math.random() * 5000;
-            const availableBalance = totalBalance * 0.7;
-            const usedMargin = totalBalance - availableBalance;
-            const totalProfit = Math.random() * 1000 - 200;
-            
-            document.getElementById('totalBalance').textContent = '$' + totalBalance.toFixed(2);
-            document.getElementById('availableBalance').textContent = '$' + availableBalance.toFixed(2);
-            document.getElementById('usedMargin').textContent = '$' + usedMargin.toFixed(2);
-            document.getElementById('totalProfit').textContent = '$' + totalProfit.toFixed(2);
-            
-            // Update trading statistics
-            document.getElementById('totalTrades').textContent = Math.floor(Math.random() * 100 + 50);
-            document.getElementById('winRate').textContent = (Math.random() * 30 + 60).toFixed(1) + '%';
-            document.getElementById('profitFactor').textContent = (Math.random() * 1.5 + 1).toFixed(2);
-            
-            // Update profit chart
-            updateProfitChart();
-            
-            // Continue updating if bot is running
-            if (botRunning) {
-                setTimeout(updateDashboard, 5000);
-            }
-        } catch (error) {
-            console.error('Error updating dashboard:', error);
+        function pauseBot() {
+            botRunning = false;
+            document.getElementById('statusText').textContent = 'Paused';
+            document.getElementById('botStatus').textContent = '⏸️';
+            showNotification('Trading bot paused', 'warning');
         }
-    }
-
-    function updatePositionsTable(positions) {
-        const tbody = document.getElementById('positionsTableBody');
-        tbody.innerHTML = '';
-        
-        if (positions.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" style="text-align: center; padding: 40px;">No open positions</td>
-                </tr>
-            `;
-            return;
-        }
-        
-        positions.forEach(pos => {
-            const positionAmt = parseFloat(pos.positionAmt);
-            const entryPrice = parseFloat(pos.entryPrice);
-            const markPrice = parseFloat(pos.markPrice);
-            const unrealizedProfit = parseFloat(pos.unrealizedProfit);
-            
-            const pnlPercent = (unrealizedProfit / (Math.abs(positionAmt) * entryPrice)) * 100;
-            
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${pos.symbol}</td>
-                <td><span style="color: ${positionAmt > 0 ? '#28a745' : '#dc3545'}">${positionAmt > 0 ? 'LONG' : 'SHORT'}</span></td>
-                <td>${Math.abs(positionAmt)}</td>
-                <td>${entryPrice.toFixed(2)}</td>
-                <td>${markPrice.toFixed(2)}</td>
-                <td class="${unrealizedProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${unrealizedProfit.toFixed(2)}</td>
-                <td class="${unrealizedProfit >= 0 ? 'profit-positive' : 'profit-negative'}">${pnlPercent.toFixed(2)}%</td>
-                <td>
-                    <button class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="closePosition('${pos.symbol}', '${positionAmt > 0 ? 'SELL' : 'BUY'}')">Close</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
-    }
-
-    async function closePosition(symbol, side) {
-        try {
-            // In a real implementation, you would call your API to close the position
-            // This is just a simulation
-            showNotification(`Closing ${symbol} ${side} position...`, 'info');
-            
-            // Simulate API call delay
-            setTimeout(() => {
-                showNotification(`Position ${symbol} closed successfully!`, 'success');
-                updateDashboard();
-            }, 1000);
-        } catch (error) {
-            console.error('Error closing position:', error);
-            showNotification('Error closing position: ' + error.message, 'error');
-        }
-    }
-
-    function updateProfitChart() {
-        const now = new Date();
-        const profit = Math.random() * 100 - 50;
-        
-        profitChart.data.labels.push(now.toLocaleTimeString());
-        profitChart.data.datasets[0].data.push(profit);
-        
-        // Keep only last 20 data points
-        if (profitChart.data.labels.length > 20) {
-            profitChart.data.labels.shift();
-            profitChart.data.datasets[0].data.shift();
-        }
-        
-        profitChart.update();
-    }
-
 
         // Configuration functions
         function saveApiConfig() {
