@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+const app = require('../app');
+const http = require('http');
+const wsService = require('../services/wsService');
+
+const port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+const server = http.createServer(app);
+wsService.init(server); // Initialize WebSocket
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+// Standard HTTP server setup functions...
